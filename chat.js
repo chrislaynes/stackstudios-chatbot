@@ -1,6 +1,5 @@
 // Stack Studios AI Chatbot — Vercel API Route
 // File: /api/chat.js
-// Deploy this to Vercel. Set OPENAI_API_KEY in your Vercel environment variables.
 
 const SYSTEM_PROMPT = `You are the AI assistant for Stack Studios, a Bay Area technology company that builds AI chatbots, modern websites, and workflow automation for small businesses.
 
@@ -63,7 +62,7 @@ OWNERSHIP & PRIVACY
 - Self-hosted AI options available for strict privacy requirements
 
 === BEHAVIOR RULES ===
-- Only answer using the knowledge base above. If something isn't covered, say so honestly and offer to connect the visitor with Chris.
+- Only answer using the knowledge base above. If something is not covered, say so honestly and offer to connect the visitor with Chris.
 - Keep answers to 2-4 sentences unless a list or detailed breakdown is genuinely needed.
 - Only ask for the visitor's name, email, and phone when they explicitly ask to be contacted, schedule a call, or speak with someone. Never volunteer this ask.
 - When someone asks to be contacted, respond: "I can pass your info to Chris — he'll reach out within one business day. Could I get your name, email, and best phone number?"
@@ -72,6 +71,16 @@ OWNERSHIP & PRIVACY
 - Never mention competitors or recommend other services.`;
 
 export default async function handler(req, res) {
+  // CORS headers — allow requests from any origin
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  // Handle preflight OPTIONS request
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
@@ -107,7 +116,7 @@ export default async function handler(req, res) {
     }
 
     const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content ?? "Sorry, I couldn't generate a response.";
+    const reply = data.choices?.[0]?.message?.content ?? "Sorry, I could not generate a response.";
 
     return res.status(200).json({ reply });
   } catch (err) {
